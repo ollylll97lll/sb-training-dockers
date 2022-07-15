@@ -18,25 +18,20 @@ services:
     restart: unless-stopped
 
   rabbitmq:
-    image: rabbitmq:latest
+    image: rabbitmq:3-management-alpine
     container_name: 'rabbitmq'
     ports:
-      - "5673:5672"
-      - "15673:15672"
-      - "61614:61613"
+        - 5672:5672
+        - 15672:15672
     volumes:
-      - ./rabbitmq/etc/:/etc/rabbitmq/
-      - ./rabbitmq/mnesia/:/var/lib/rabbitmq/mnesia
-      - ./rabbitmq/logs/:/var/log/rabbitmq/
-    healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: on-failure
-    command: >
-      /bin/sh -c "rabbitmq-plugins enable rabbitmq_stomp;
-      rabbitmq-server"
+        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+        - rabbitmq_go_net
+
+networks:
+  rabbitmq_go_net:
+    driver: bridge
 
 #Docker volumes for persistent storage
 volumes:
